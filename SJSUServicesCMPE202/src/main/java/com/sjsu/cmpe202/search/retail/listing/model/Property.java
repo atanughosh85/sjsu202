@@ -7,11 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 
 @Entity
-public class Property {
-
-	
-	
-	 
+public class Property { 
 	 
 	@javax.persistence.Id
 	@GeneratedValue	
