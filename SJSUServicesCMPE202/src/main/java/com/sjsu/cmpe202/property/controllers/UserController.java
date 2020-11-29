@@ -73,9 +73,6 @@ public class UserController {
 	}
 
 	
-	
-	
-	
 	/*
 	 * Add new users to the table
 	 */
@@ -85,19 +82,9 @@ public class UserController {
 		System.out.println("user email:"+user.getEmail());
 
 		userServices.saveUser(user);
-
 	}
-	/*
-	@PostMapping("/user")
-	public ResponseEntity<Object> createUser(@RequestBody User user) {
-		User savedUser = userRepository.save(user);
-
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-				.buildAndExpand(savedUser.getUserid()).toUri();
-
-		return ResponseEntity.created(location).build();
-
-	}
-	*/
+	
+	
+	
 	
 }
