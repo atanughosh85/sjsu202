@@ -1,9 +1,11 @@
 package com.sjsu.cmpe202.search.retail.listing.model;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-
 import com.ibm.db2.cmx.annotation.Table;
+
+/*
+ * Author: Atanu Ghosh
+ */
 
 
 @Table(name= "USER", schema = "TRZ79994")
@@ -47,11 +49,5 @@ public class User {
 	}
 	public void setStatus(String status) {
 		this.status = status;
-	}
-
-	
-	
-	
-	
-	
+	}	
 }

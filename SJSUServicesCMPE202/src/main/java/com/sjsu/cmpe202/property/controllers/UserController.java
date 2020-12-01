@@ -1,29 +1,26 @@
 package com.sjsu.cmpe202.property.controllers;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Optional;
 import javax.persistence.EntityManager;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import com.sjsu.cmpe202.property.repositories.UserRepository;
-import com.sjsu.cmpe202.search.retail.listing.model.Property;
 import com.sjsu.cmpe202.search.retail.listing.model.User;
 import com.sjsu.cmpe202.search.retail.listing.services.UserServices;
+
+/*
+ * Author: Atanu Ghosh
+ */
 
 @Repository
 @RestController
@@ -39,9 +36,7 @@ public class UserController {
 	public void setUserService(UserServices userService) {
 		this.userServices = userService;
 	}
-	
-	
-	
+
 	/*
 	 * Shows all users
 	 */
@@ -68,23 +63,41 @@ public class UserController {
 		Map<String, Object> modelMap = model.asMap();
 		listOfUser=(ArrayList<User>) modelMap.get("user");
 		return listOfUser.get(0);
-
-
 	}
 
-	
+
 	/*
 	 * Add new users to the table
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "user/add")
-	public void getProperty(@RequestBody User user)
+	public void addUser(@RequestBody User user)
 	{
-		System.out.println("user email:"+user.getEmail());
-
 		userServices.saveUser(user);
 	}
-	
-	
-	
-	
+
+
+	/*
+	 * Update user status from "Pending" to Approved/Reject
+	 */
+	@RequestMapping(method = RequestMethod.PUT, value="/user/update")
+	public ResponseEntity<Object> updateUser(@RequestBody User user)
+	{
+		Optional<User> userOptional = userRepository.findById(user.getUserid());
+		if (!userOptional.isPresent())
+			return ResponseEntity.notFound().build();
+		user.setStatus(user.getStatus());
+		userRepository.save(user);
+		return ResponseEntity.noContent().build();
+
+	}
+
+	/*
+	 * Delete property by ID
+	 */
+	@RequestMapping("/user/delete/{id}")
+	public String delete(@PathVariable String id){
+		userServices.delete(Long.valueOf(id));
+		return "delete successful";
+	}
+
 }

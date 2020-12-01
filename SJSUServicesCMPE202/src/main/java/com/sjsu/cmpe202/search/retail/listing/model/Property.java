@@ -6,6 +6,10 @@ import java.sql.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 
+/*
+ * Author: Atanu Ghosh
+ */
+
 @Entity
 public class Property { 
 	 
