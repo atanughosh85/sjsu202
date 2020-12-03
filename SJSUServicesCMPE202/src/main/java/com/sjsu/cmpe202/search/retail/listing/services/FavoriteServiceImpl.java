@@ -3,7 +3,6 @@ package com.sjsu.cmpe202.search.retail.listing.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import com.sjsu.cmpe202.property.repositories.FavoriteRepository;
 import com.sjsu.cmpe202.search.retail.listing.model.Favorite;
-import com.sjsu.cmpe202.search.retail.listing.model.User;
 
 /*
  * Author: Atanu Ghosh
@@ -91,22 +89,33 @@ public class FavoriteServiceImpl implements FavoriteService{
 		 }
 		 CriteriaQuery<Favorite> cq = cb.createQuery(Favorite.class);
 		 Root<Favorite> favorite = cq.from(Favorite.class);
-		 Predicate predicate = null;
-
+		 Predicate existingpredicate = null;
+		 int predicateCount=0;
+		 Predicate masterPredicate=null;
+		 
 		 try {
 
 			 for (Map.Entry<String,String> entry : customQuery.entrySet())  
 			 {   
 				 if(favorite.get(entry.getKey().toString()) != null)
 				 {
-					 predicate = cb.equal(favorite.get(entry.getKey().toString()), customQuery.get(entry.getKey().toString()));
+					 if(predicateCount==0)
+						{
+							masterPredicate = cb.equal(favorite.get(entry.getKey().toString()), customQuery.get(entry.getKey().toString()));
+						}
+						else
+						{
+							existingpredicate = cb.equal(favorite.get(entry.getKey().toString()), customQuery.get(entry.getKey().toString()));
+							masterPredicate=cb.and(masterPredicate,existingpredicate);
+						}
+						predicateCount++;
 
 				 }
 			 }
 		 }catch (Exception e) {
 			 e.printStackTrace();
 		 }
-		 cq.where(predicate);
+		 cq.where(masterPredicate);
 		 TypedQuery<Favorite> query = em.createQuery(cq);
 		 return query;
 	 }

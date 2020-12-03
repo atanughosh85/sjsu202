@@ -90,7 +90,9 @@ public class PropertyServicesImpl implements PropertyServices{
 		}
 		CriteriaQuery<Property> cq = cb.createQuery(Property.class);
 		Root<Property> property = cq.from(Property.class);
-		Predicate predicate = null;
+		Predicate existingpredicate = null;
+		int predicateCount=0;
+		Predicate masterPredicate=null;
 
 		try {
 
@@ -98,24 +100,45 @@ public class PropertyServicesImpl implements PropertyServices{
 			{
 				if(property.get(entry.getKey().toString()) != null)
 				{
+					
 					//Query for range values with comma(,) as delimiter
 					if(entry.getValue().contains(","))
 					{
 						int minRange=Integer.parseInt(customQuery.get(entry.getKey().toString()).split(",")[0]);
 						int maxRange=Integer.parseInt(customQuery.get(entry.getKey().toString()).split(",")[1]);
-						predicate = cb.between(property.get(entry.getKey().toString()),minRange, maxRange );
+						if(predicateCount==0)
+						{
+							masterPredicate = cb.between(property.get(entry.getKey().toString()),minRange, maxRange );
+						}
+						else
+						{
+							existingpredicate = cb.between(property.get(entry.getKey().toString()),minRange, maxRange );
+							masterPredicate=cb.and(masterPredicate,existingpredicate);
+						}
+						predicateCount++;
 					}
 					//Query for equals values
 					else
 					{
-						predicate = cb.equal(property.get(entry.getKey().toString()), customQuery.get(entry.getKey().toString()));
+						
+						if(predicateCount==0)
+						{
+							masterPredicate = cb.equal(property.get(entry.getKey().toString()), customQuery.get(entry.getKey().toString()));
+						}
+						else
+						{
+							existingpredicate = cb.equal(property.get(entry.getKey().toString()), customQuery.get(entry.getKey().toString()));
+							masterPredicate=cb.and(masterPredicate,existingpredicate);
+						}
+						predicateCount++;
+						//cq.where(predicate);
 					}
 				}
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
-		cq.where(predicate);
+		cq.where(masterPredicate);
 		TypedQuery<Property> query = em.createQuery(cq);
 		return query;
 	}
